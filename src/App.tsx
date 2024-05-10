@@ -13,10 +13,33 @@ import {
     Text,
     useDisclosure
 } from '@chakra-ui/react'
+import { useRef, useState } from 'react'
 import Webcam from 'react-webcam'
 
 function App() {
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const webcamRef = useRef<Webcam | null>(null)
+    const [capturedImage, setCapturedImage] = useState<string | null>(null)
+
+    const capture = () => {
+        const imageSrc = webcamRef.current?.getScreenshot()
+        setCapturedImage(imageSrc ?? null)
+
+        // Envío de la imagen capturada mediante POST
+        fetch('URL_DE_TU_ENDPOINT', {
+            method: 'POST',
+            body: JSON.stringify({ image: imageSrc }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response) => {
+                // Manejar la respuesta si es necesario
+            })
+            .catch((error) => {
+                console.error('Error al enviar la imagen:', error)
+            })
+    }
 
     return (
         <Container maxW='container.sm' centerContent>
@@ -38,14 +61,16 @@ function App() {
                             Lorem ipsum dolor sit, amet consectetur adipisicing elit. Doloremque quod eius totam ducimus
                             qui modi. Sit, voluptatibus perferendis.
                         </Text>
-                        <Webcam />
+                        <Webcam ref={webcamRef} screenshotFormat='image/jpeg' audio={false} />
                     </ModalBody>
 
                     <ModalFooter>
                         <Button colorScheme='blue' mr={3} onClick={onClose}>
                             Close
                         </Button>
-                        <Button colorScheme='red'>Enviar DATA</Button>
+                        <Button colorScheme='red' onClick={capture}>
+                            Enviar DATA
+                        </Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
