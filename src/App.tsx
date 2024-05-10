@@ -20,10 +20,13 @@ function App() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const webcamRef = useRef<Webcam | null>(null)
     const [capturedImage, setCapturedImage] = useState<string | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isSubmitted, setIsSubmitted] = useState(false)
 
     const capture = () => {
         const imageSrc = webcamRef.current?.getScreenshot()
         setCapturedImage(imageSrc ?? null)
+        setIsSubmitting(true)
 
         // Envío de la imagen capturada mediante POST
         fetch('URL_DE_TU_ENDPOINT', {
@@ -35,10 +38,18 @@ function App() {
         })
             .then((response) => {
                 // Manejar la respuesta si es necesario
+                setIsSubmitting(false)
+                setIsSubmitted(true)
             })
             .catch((error) => {
                 console.error('Error al enviar la imagen:', error)
+                setIsSubmitting(false)
             })
+    }
+
+    const resetSubmission = () => {
+        setIsSubmitted(false)
+        setCapturedImage(null)
     }
 
     return (
@@ -61,19 +72,54 @@ function App() {
                             Lorem ipsum dolor sit, amet consectetur adipisicing elit. Doloremque quod eius totam ducimus
                             qui modi. Sit, voluptatibus perferendis.
                         </Text>
-                        <Webcam ref={webcamRef} screenshotFormat='image/jpeg' audio={false} />
+                        {capturedImage ? (
+                            <img src={capturedImage} alt='Captured' />
+                        ) : (
+                            <Webcam ref={webcamRef} screenshotFormat='image/jpeg' audio={false} />
+                        )}
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button colorScheme='blue' mr={3} onClick={onClose}>
-                            Close
-                        </Button>
-                        <Button colorScheme='red' onClick={capture}>
-                            Enviar DATA
-                        </Button>
+                        {!isSubmitted && (
+                            <Button colorScheme='blue' mr={3} onClick={onClose}>
+                                Close
+                            </Button>
+                        )}
+                        {!isSubmitted ? (
+                            <Button
+                                colorScheme='red'
+                                onClick={capture}
+                                isLoading={isSubmitting}
+                                loadingText='Submitting'
+                                disabled={isSubmitting}>
+                                Enviar FOTO
+                            </Button>
+                        ) : (
+                            <Button colorScheme='green' onClick={resetSubmission}>
+                                Ok
+                            </Button>
+                        )}
                     </ModalFooter>
                 </ModalContent>
             </Modal>
+
+            {isSubmitted && (
+                <Modal isOpen={isSubmitted} onClose={resetSubmission}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>¡Foto enviada correctamente!</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            <Text>Tu foto se ha enviado correctamente.</Text>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme='green' onClick={resetSubmission}>
+                                Ok
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
         </Container>
     )
 }
