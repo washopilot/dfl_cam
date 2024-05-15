@@ -85,7 +85,7 @@ function App() {
                                 Close
                             </Button>
                         )}
-                        {!isSubmitted ? (
+                        {!isSubmitted && (
                             <Button
                                 colorScheme='red'
                                 onClick={capture}
@@ -93,10 +93,6 @@ function App() {
                                 loadingText='Submitting'
                                 disabled={isSubmitting}>
                                 Enviar FOTO
-                            </Button>
-                        ) : (
-                            <Button colorScheme='green' onClick={resetSubmission}>
-                                Ok
                             </Button>
                         )}
                     </ModalFooter>
