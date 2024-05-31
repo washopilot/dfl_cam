@@ -82,7 +82,7 @@ function App() {
                     <ModalFooter>
                         {!isSubmitted && (
                             <Button colorScheme='blue' mr={3} onClick={onClose}>
-                                Close
+                                Cerrar
                             </Button>
                         )}
                         {!isSubmitted && (
@@ -90,7 +90,7 @@ function App() {
                                 colorScheme='red'
                                 onClick={capture}
                                 isLoading={isSubmitting}
-                                loadingText='Submitting'
+                                loadingText='Enviando...'
                                 disabled={isSubmitting}>
                                 Enviar FOTO
                             </Button>
